@@ -1,0 +1,90 @@
+<section class="section-head">
+  <h1><%= @product.name %></h1>
+  <%= link_to "Back to Products", products_path, class: "btn btn-secondary" %>
+</section>
+
+<section class="product-detail">
+  <div class="product-detail-media">
+    <% if @product.images.attached? %>
+      <% @product.images.each do |image| %>
+        <%= image_tag image, alt: @product.name %>
+      <% end %>
+    <% else %>
+      <%= image_tag "https://picsum.photos/seed/product-show-#{@product.id}/800/520", alt: "#{@product.name} placeholder" %>
+    <% end %>
+  </div>
+
+  <div class="product-detail-content">
+    <p><strong>Description:</strong> <%= @product.description.presence || "No description" %></p>
+    <p><strong>Price:</strong> ₹ <%= @product.price %></p>
+    <p><strong>Status:</strong> <%= @product.status ? "Active" : "Inactive" %></p>
+    <p><strong>Stock:</strong> <%= @product.stock %></p>
+    <p><strong>Category:</strong> <%= @product.category.name %></p>
+
+    <% if @reviews.any? %>
+      <% avg_rating = (@reviews.sum(&:rating).to_f / @reviews.size).round(1) %>
+      <p><strong>Average Rating:</strong> <%= avg_rating %> / 5</p>
+    <% else %>
+      <p><strong>Average Rating:</strong> No ratings yet</p>
+    <% end %>
+
+    <div class="product-detail-actions">
+      <% if customer_user? %>
+        <%= button_to "Add to Cart", add_to_cart_product_path(@product), method: :post, class: "btn btn-primary" %>
+        <%= button_to "Order Now", quick_order_product_path(@product), method: :post, class: "btn btn-primary" %>
+        <%= button_to "Add to Wishlist", add_to_wishlist_product_path(@product), method: :post, class: "btn btn-secondary" %>
+      <% elsif admin_user? %>
+        <%= link_to "Edit Product", edit_product_path(@product), class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="reviews-panel">
+  <div class="section-head">
+    <h2>Reviews</h2>
+  </div>
+
+  <% if customer_user? %>
+    <%= form_with model: [@product, @review], local: true, class: "review-form" do |f| %>
+      <% if @review.errors.any? %>
+        <div class="error-messages">
+          <% @review.errors.full_messages.each do |msg| %>
+            <p><%= msg %></p>
+          <% end %>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <%= f.label :rating %>
+        <%= f.select :rating, options_for_select((1..5).to_a, @review.rating), { include_blank: "Select rating" }, class: "form-control" %>
+      </div>
+
+      <div class="form-group">
+        <%= f.label :comment %>
+        <%= f.text_area :comment, rows: 3, class: "form-control" %>
+      </div>
+
+      <div class="form-actions">
+        <%= f.submit "Submit Review", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% if @reviews.any? %>
+    <ul class="review-list">
+      <% @reviews.each do |review| %>
+        <li class="review-item">
+          <p><strong><%= review.user.name %></strong> - <%= review.rating %>/5</p>
+          <p><%= review.comment %></p>
+          <p class="muted-text"><%= review.created_at.strftime("%d %b %Y %I:%M %p") %></p>
+          <% if admin_user? || review.user == current_user %>
+            <%= button_to "Delete Review", product_review_path(@product, review), method: :delete, form: { data: { turbo_confirm: "Delete this review?" } }, class: "tiny-action" %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="empty-state">No reviews yet. Be the first to review this product.</p>
+  <% end %>
+</section>

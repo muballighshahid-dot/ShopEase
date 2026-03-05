@@ -1,0 +1,58 @@
+<%= form_with model: @product, local: true, html: { class: 'product-form' } do |f| %>
+
+  <% if @product.errors.any? %>
+    <div class="error-messages">
+      <h3><%= pluralize(@product.errors.count, "error") %> prevented saving:</h3>
+      <ul>
+        <% @product.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name %><br>
+    <%= f.text_field :name, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :description %><br>
+    <%= f.text_area :description, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :price %><br>
+    <%= f.number_field :price, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :stock %><br>
+    <%= f.number_field :stock, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :status %><br>
+    <%= f.select :status, ["active", "inactive"], {}, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :category_id, "Category" %><br>
+    <%= f.collection_select :category_id,
+                            Category.all,
+                            :id,
+                            :name,
+                            { prompt: "Select Category" },
+                            class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :images %><br>
+    <%= f.file_field :images, multiple: true, class: 'form-control-file' %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit class: 'btn btn-primary' %>
+  </div>
+
+<% end %>

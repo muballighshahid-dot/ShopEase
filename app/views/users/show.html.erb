@@ -1,0 +1,57 @@
+<section class="user-dashboard">
+  <header class="user-header">
+    <h1><%= @user.name %>'s Dashboard</h1>
+    <div class="user-info">
+      <p><strong>Email:</strong> <%= @user.email %></p>
+      <p><strong>Role:</strong> <%= @user.role %></p>
+    </div>
+  </header>
+
+  <hr>
+
+  <section class="summary-section">
+    <h2>Summary</h2>
+    <div class="summary-boxes">
+      <div class="stat-box">
+        <h3>Products</h3>
+        <p><%= @user.products.count %></p>
+      </div>
+      <div class="stat-box">
+        <h3>Orders</h3>
+        <p><%= @user.orders.count %></p>
+      </div>
+      <div class="stat-box">
+        <h3>Reviews</h3>
+        <p><%= @user.reviews.count %></p>
+      </div>
+    </div>
+    <div class="actions">
+      <%= link_to "Add Product", new_product_path(user_id: @user.id), class: "btn btn-primary" %>
+    </div>
+  </section>
+
+  <hr>
+
+  <section class="recent-products">
+    <h2>Recent Products</h2>
+    <% if @user.products.any? %>
+      <ul class="product-list">
+        <% @user.products.order(created_at: :desc).limit(5).each do |product| %>
+          <li class="product-item">
+            <span class="product-name"><%= product.name %></span>
+            <span class="product-price">₹ <%= product.price %></span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No products yet.</p>
+    <% end %>
+  </section>
+
+  <hr>
+
+  <footer class="user-actions">
+    <%= link_to "Edit User", edit_user_path(@user), class: "btn btn-secondary" %>
+    <%= link_to "Back", users_path, class: "btn btn-link" %>
+  </footer>
+</section>

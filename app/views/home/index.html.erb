@@ -1,0 +1,98 @@
+<section class="hero">
+  <div>
+    <p class="hero-kicker">Modern Commerce</p>
+    <h1>Everything You Need To Run Your Store</h1>
+    <p class="hero-copy">
+      Manage catalog, orders, cart activity, wishlists, and customer profiles from one place.
+    </p>
+    <div class="hero-actions">
+      <%= link_to "Browse Products", products_path, class: "btn btn-primary" %>
+      <% if admin_user? %>
+        <%= link_to "Manage Users", users_path, class: "btn btn-secondary" %>
+      <% else %>
+        <%= link_to "My Cart", carts_path, class: "btn btn-secondary" %>
+      <% end %>
+    </div>
+  </div>
+  <div class="hero-panel">
+    <p><strong>Orders</strong> <span><%= @user_orders_count %></span></p>
+    <p><strong>Cart Items</strong> <span><%= @user_cart_items_count %></span></p>
+    <p><strong>Wishlists</strong> <span><%= @user_wishlists_count %></span></p>
+  </div>
+</section>
+
+<section class="quick-grid">
+  <% if customer_user? %>
+    <%= link_to orders_path, class: "quick-card" do %>
+      <h2>Orders</h2>
+      <p>Track and manage your orders.</p>
+    <% end %>
+
+    <%= link_to carts_path, class: "quick-card" do %>
+      <h2>Cart</h2>
+      <p>See active carts and checkout activity.</p>
+    <% end %>
+
+    <%= link_to wishlists_path, class: "quick-card" do %>
+      <h2>Wishlist</h2>
+      <p>Review saved products.</p>
+    <% end %>
+  <% else %>
+    <%= link_to products_path, class: "quick-card" do %>
+      <h2>Product Admin</h2>
+      <p>Add, edit, and remove catalog products.</p>
+    <% end %>
+
+    <%= link_to users_path, class: "quick-card" do %>
+      <h2>User Admin</h2>
+      <p>Set roles and manage platform users.</p>
+    <% end %>
+  <% end %>
+
+  <% if current_user %>
+    <% profile_link = current_user.profile.present? ? user_profile_path(current_user) : new_user_profile_path(current_user) %>
+    <%= link_to profile_link, class: "quick-card" do %>
+      <h2>Profile</h2>
+      <p>Update personal details and preferences.</p>
+    <% end %>
+  <% end %>
+</section>
+
+<section class="catalog-section">
+  <div class="section-head">
+    <h2>Featured Products</h2>
+    <%= link_to "View All", products_path %>
+  </div>
+
+  <% if @featured_products.any? %>
+    <div class="product-grid">
+      <% @featured_products.each do |product| %>
+        <article class="product-card">
+          <%= link_to product_path(product), class: "product-card-link" do %>
+            <div class="product-card-media">
+              <% if product.images.attached? %>
+                <%= image_tag product.images.first, alt: product.name %>
+              <% else %>
+                <%= image_tag "https://picsum.photos/seed/home-product-#{product.id}/640/420", alt: "#{product.name} placeholder" %>
+              <% end %>
+            </div>
+            <h3><%= product.name %></h3>
+          <% end %>
+          <p><%= product.category&.name || "Uncategorized" %></p>
+          <strong>₹ <%= product.price %></strong>
+          <div class="product-card-actions">
+            <% if customer_user? %>
+              <%= button_to "Order Now", quick_order_product_path(product), method: :post, class: "btn btn-primary" %>
+              <%= button_to "Add to Cart", add_to_cart_product_path(product), method: :post, class: "btn btn-primary" %>
+              <%= button_to "Wishlist", add_to_wishlist_product_path(product), method: :post, class: "btn btn-secondary" %>
+            <% elsif admin_user? %>
+              <%= link_to "Edit Product", edit_product_path(product), class: "btn btn-secondary" %>
+            <% end %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="empty-state">No products available yet.</p>
+  <% end %>
+</section>

@@ -1,0 +1,45 @@
+<section class="section-head">
+  <h1>Orders</h1>
+  <%= link_to "Go To Cart", carts_path, class: "btn btn-primary" %>
+</section>
+
+<% if @orders.any? %>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Order</th>
+        <th>Status</th>
+        <th>Total</th>
+        <th>Items</th>
+        <th>Products</th>
+        <th>Placed On</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr>
+          <td><%= order.order_number.presence || "##{order.id}" %></td>
+          <td><span class="status-chip"><%= order.status.to_s.humanize %></span></td>
+          <td>₹ <%= order.total_amount || 0 %></td>
+          <td><%= order.order_items.size %></td>
+          <td>
+            <% if order.order_items.any? %>
+              <ul class="compact-list">
+                <% order.order_items.each do |item| %>
+                  <li><%= item.product.name %> x <%= item.quantity %></li>
+                <% end %>
+              </ul>
+            <% end %>
+          </td>
+          <td><%= order.created_at.strftime("%d %b %Y") %></td>
+          <td>
+            <%= link_to "Show", order_path(order) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="empty-state">No orders yet.</p>
+<% end %>

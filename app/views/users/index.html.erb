@@ -1,0 +1,43 @@
+<h1>Users</h1>
+
+<%= link_to "New User", new_user_path %>
+|
+<%= link_to "Login", login_users_path %>
+
+<hr>
+
+<table class="users-table">
+  <thead>
+    <tr>
+      <th>Avatar</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <% @users.each do |user| %>
+    <tr>
+      <td>
+        <% if user.avatar.attached? %>
+          <%= image_tag user.avatar, class: "avatar-img", alt: "#{user.name} avatar" %>
+        <% else %>
+          <%= image_tag "https://picsum.photos/seed/user-avatar-#{user.id}/120/120", class: "avatar-img", alt: "#{user.name} placeholder avatar" %>
+        <% end %>
+      </td>
+
+      <td><%= user.name %></td>
+      <td><%= user.email %></td>
+      <td><%= (user.role || "customer").humanize %></td>
+
+      <td class="link-actions">
+        <%= link_to "Show", user_path(user) %>
+        <%= link_to "Edit", edit_user_path(user) %>
+        <%= button_to "Delete", user_path(user),
+              method: :delete,
+              form: { data: { turbo_confirm: "Are you sure?" } } %>
+      </td>
+    </tr>
+  <% end %>
+</table>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Shop Ease" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Shop Ease">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <%= stylesheet_link_tag :application, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="site-body">
+    <% profile_path = nil %>
+    <% if current_user %>
+      <% profile_path = current_user.profile.present? ? user_profile_path(current_user) : new_user_profile_path(current_user) %>
+    <% end %>
+
+    <header class="site-header">
+      <div class="nav-shell">
+        <%= link_to root_path, class: "site-brand" do %>
+          <%= image_tag "/icon.svg", class: "brand-logo", alt: "ShopEase logo" %>
+          <span>ShopEase</span>
+        <% end %>
+        <nav class="site-nav">
+          <%= link_to "Home", root_path, class: "nav-link" %>
+          <%= link_to "Products", products_path, class: "nav-link" %>
+          <% if customer_user? %>
+            <%= link_to "Orders", orders_path, class: "nav-link" %>
+            <%= link_to "Cart", carts_path, class: "nav-link" %>
+            <%= link_to "Wishlist", wishlists_path, class: "nav-link" %>
+          <% end %>
+          <% if admin_user? %>
+            <%= link_to "Users", users_path, class: "nav-link" %>
+          <% end %>
+        </nav>
+        <% if profile_path && current_user %>
+          <%= link_to profile_path, class: "profile-chip" do %>
+            <% if current_user.avatar.attached? %>
+              <%= image_tag current_user.avatar, class: "profile-chip-avatar", alt: "#{current_user.name} avatar" %>
+            <% else %>
+              <%= image_tag "https://picsum.photos/seed/nav-user-#{current_user.id}/80/80", class: "profile-chip-avatar", alt: "#{current_user.name} avatar placeholder" %>
+            <% end %>
+            <span class="profile-chip-name"><%= current_user.name %></span>
+          <% end %>
+        <% end %>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <% if notice.present? %>
+        <p class="flash flash-notice"><%= notice %></p>
+      <% end %>
+      <% if alert.present? %>
+        <p class="flash flash-alert"><%= alert %></p>
+      <% end %>
+      <% if flash[:error].present? %>
+        <p class="flash flash-alert"><%= flash[:error] %></p>
+      <% end %>
+      <%= yield %>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-shell">
+        <p>ShopEase</p>
+        <p>Simple shopping flows for products, orders, carts, wishlists, and profile.</p>
+      </div>
+    </footer>
+  </body>
+</html>

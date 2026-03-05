@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  tracking_number: MyString
+  carrier: MyString
+  status: MyString
+  order: one
+  shipped_at: 2026-02-26 06:18:10
+  delivered_at: 2026-02-26 06:18:10
+
+two:
+  tracking_number: MyString
+  carrier: MyString
+  status: MyString
+  order: two
+  shipped_at: 2026-02-26 06:18:10
+  delivered_at: 2026-02-26 06:18:10

@@ -1,0 +1,32 @@
+<section class="section-head">
+  <h1>Wishlists</h1>
+  <%= link_to "Create Wishlist", new_wishlist_path, class: "btn btn-primary" %>
+</section>
+
+<% if @wishlists.any? %>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Products</th>
+        <th>Updated</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @wishlists.each do |wishlist| %>
+        <tr>
+          <td><%= wishlist.name %></td>
+          <td><%= wishlist.wishlist_items.count %></td>
+          <td><%= wishlist.updated_at.strftime("%d %b %Y") %></td>
+          <td>
+            <%= link_to "Show", wishlist_path(wishlist) %>
+            <%= link_to "Edit", edit_wishlist_path(wishlist) %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="empty-state">No wishlists created yet.</p>
+<% end %>

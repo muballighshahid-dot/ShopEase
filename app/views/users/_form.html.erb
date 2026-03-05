@@ -1,0 +1,45 @@
+<%= form_with model: @user, local: true, html: { class: 'user-form' } do |f| %>
+
+  <% if @user.errors.any? %>
+    <div class="error-messages">
+      <% @user.errors.full_messages.each do |msg| %>
+        <p><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name %><br>
+    <%= f.text_field :name, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :email %><br>
+    <%= f.email_field :email, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :password %><br>
+    <%= f.password_field :password, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :role %><br>
+    <%= f.select :role, [["Admin", "admin"], ["Customer", "customer"]], {}, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :phone %><br>
+    <%= f.text_field :phone, class: 'form-control' %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :avatar %><br>
+    <%= f.file_field :avatar, class: 'form-control-file' %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.submit class: 'btn btn-primary' %>
+  </div>
+
+<% end %>

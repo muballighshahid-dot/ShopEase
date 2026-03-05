@@ -1,0 +1,116 @@
+<% content_for :head do %>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<% end %>
+
+<%
+  products_payload = @products.map do |product|
+    {
+      id: product.id,
+      name: product.name,
+      price: product.price.to_s,
+      status: product.status ? "Active" : "Inactive",
+      image_url: (product.images.attached? ? url_for(product.images.first) : "https://picsum.photos/seed/products-react-#{product.id}/600/400"),
+      show_path: product_path(product),
+      edit_path: edit_product_path(product),
+      delete_path: product_path(product),
+      add_to_cart_path: add_to_cart_product_path(product),
+      add_to_wishlist_path: add_to_wishlist_product_path(product)
+    }
+  end
+%>
+
+<div
+  id="products-react-root"
+  data-products="<%= json_escape(products_payload.to_json) %>"
+  data-admin="<%= admin_user? %>"
+></div>
+
+<script>
+  document.addEventListener("turbo:load", function() {
+    const rootElement = document.getElementById("products-react-root");
+    if (!rootElement) return;
+
+    const e = React.createElement;
+    const products = JSON.parse(rootElement.dataset.products || "[]");
+    const isAdmin = rootElement.dataset.admin === "true";
+
+    function actionLink(text, href, extraClasses, attrs) {
+      const props = Object.assign(
+        { href: href, className: "text-sm font-medium " + (extraClasses || "") },
+        attrs || {}
+      );
+      return e("a", props, text);
+    }
+
+    function ProductCard(product) {
+      const statusClass =
+        product.status === "Active"
+          ? "bg-emerald-100 text-emerald-700"
+          : "bg-rose-100 text-rose-700";
+
+      const actions = [
+        actionLink("Show", product.show_path, "text-sky-700 hover:text-sky-900", { key: "show" })
+      ];
+
+      if (isAdmin) {
+        actions.push(actionLink("Edit", product.edit_path, "text-indigo-700 hover:text-indigo-900", { key: "edit" }));
+        actions.push(
+          actionLink("Delete", product.delete_path, "text-red-700 hover:text-red-900", {
+            key: "delete",
+            "data-turbo-method": "delete",
+            "data-turbo-confirm": "Are you sure?"
+          })
+        );
+      } else {
+        actions.push(
+          actionLink("Add to Cart", product.add_to_cart_path, "text-teal-700 hover:text-teal-900", {
+            key: "cart",
+            "data-turbo-method": "post"
+          })
+        );
+        actions.push(
+          actionLink("Wishlist", product.add_to_wishlist_path, "text-purple-700 hover:text-purple-900", {
+            key: "wishlist",
+            "data-turbo-method": "post"
+          })
+        );
+      }
+
+      return e("article", { className: "rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-shadow p-4 flex flex-col gap-3", key: product.id }, [
+        e("a", { href: product.show_path, className: "block overflow-hidden rounded-xl", key: "image-link" },
+          e("img", {
+            src: product.image_url,
+            alt: product.name,
+            className: "w-full h-44 object-cover hover:scale-[1.03] transition-transform"
+          })
+        ),
+        e("div", { className: "flex items-start justify-between gap-2", key: "title-row" }, [
+          e("h3", { className: "font-semibold text-slate-900 leading-tight", key: "name" }, product.name),
+          e("span", { className: "text-xs px-2 py-1 rounded-full " + statusClass, key: "status" }, product.status)
+        ]),
+        e("p", { className: "text-lg font-bold text-slate-800", key: "price" }, "₹ " + product.price),
+        e("div", { className: "flex flex-wrap gap-3 pt-1", key: "actions" }, actions)
+      ]);
+    }
+
+    const app = e("section", { className: "max-w-7xl mx-auto px-4 py-6" }, [
+      e("div", { className: "flex items-center justify-between mb-6", key: "header" }, [
+        e("h1", { className: "text-3xl font-extrabold text-slate-900", key: "title" }, "Products"),
+        isAdmin
+          ? e("a", {
+              href: "/products/new",
+              className: "rounded-lg bg-slate-900 text-white px-4 py-2 text-sm font-semibold hover:bg-slate-700",
+              key: "new"
+            }, "New Product")
+          : null
+      ]),
+      e("div", { className: "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5", key: "grid" },
+        products.map(ProductCard)
+      )
+    ]);
+
+    ReactDOM.createRoot(rootElement).render(app);
+  });
+</script>

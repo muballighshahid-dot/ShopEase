@@ -1,0 +1,9 @@
+<h1>Order Status Updated</h1>
+<p>Hello <%= @order.user.name %>,</p>
+<p>Your order status has changed.</p>
+<ul>
+  <li><strong>Order Number:</strong> <%= @order.order_number %></li>
+  <li><strong>Current Status:</strong> <%= @order.status %></li>
+  <li><strong>Total Amount:</strong> <%= @order.total_amount %></li>
+</ul>
+<p>Thanks,<br>ShopEase</p>
