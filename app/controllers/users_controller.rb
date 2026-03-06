@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
-  before_action :authenticate_stub, except: [:index, :show, :login, :login_create]
+  before_action :require_login!, except: [:new, :create, :login, :login_create]
   before_action :set_user, only: [:show, :edit, :update, :destroy, :promote]
-  before_action :authorize_admin_stub, only: [:destroy, :promote]
+  before_action :require_admin!, only: [:destroy, :promote]
   after_action  :log_action
   around_action :wrap_transaction, only: [:create]
 
@@ -32,28 +32,36 @@ class UsersController < ApplicationController
     if user&.authenticate(params[:password])
       session[:user_id] = user.id
       NotificationMailer.login_alert(user).deliver_later
-      redirect_to user_path(user), notice: "Logged in successfully."
+      redirect_to root_path, notice: "Logged in successfully."
     else
       flash.now[:alert] = "Invalid email or password"
       render :login, status: :unprocessable_entity
     end
   end
-def create
-  @user = User.new(user_params)
 
-  respond_to do |format|
-    if @user.save
-      # send email
-      UserMailer.with(user: @user).welcome_email.deliver_later
+  def logout
+    session.delete(:user_id)
+    redirect_to root_path, notice: "Logged out successfully."
+  end
 
-      format.html { redirect_to user_url(@user), notice: "User was successfully created." }
-      format.json { render :show, status: :created, location: @user }
-    else
-      format.html { render :new, status: :unprocessable_entity }
-      format.json { render json: @user.errors, status: :unprocessable_entity }
+  def create
+    @user = User.new(user_params)
+    @user.role = :customer unless admin_user? && params.dig(:user, :role).present?
+
+    respond_to do |format|
+      if @user.save
+        # send email
+        UserMailer.with(user: @user).welcome_email.deliver_later
+
+        session[:user_id] = @user.id unless current_user
+        format.html { redirect_to root_path, notice: "User was successfully created." }
+        format.json { render :show, status: :created, location: @user }
+      else
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: @user.errors, status: :unprocessable_entity }
+      end
     end
   end
-end
 
   def update
     begin
@@ -80,9 +88,6 @@ end
 
   private
 
-  def authenticate_stub; true; end
-  def authorize_admin_stub; true; end
-
   def set_user
     @user = User.find(params[:id])
   end
@@ -96,7 +101,8 @@ end
   end
 
   def user_params
-    params.require(:user)
-          .permit(:name, :email, :password, :phone, :role, :avatar)
+    permitted = [:name, :email, :password, :phone, :avatar]
+    permitted << :role if admin_user?
+    params.require(:user).permit(*permitted)
   end
 end

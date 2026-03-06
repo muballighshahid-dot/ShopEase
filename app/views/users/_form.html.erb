@@ -23,10 +23,12 @@
     <%= f.password_field :password, class: 'form-control' %>
   </div>
 
-  <div class="form-group">
-    <%= f.label :role %><br>
-    <%= f.select :role, [["Admin", "admin"], ["Customer", "customer"]], {}, class: 'form-control' %>
-  </div>
+  <% if admin_user? %>
+    <div class="form-group">
+      <%= f.label :role %><br>
+      <%= f.select :role, [["Admin", "admin"], ["Customer", "customer"]], {}, class: 'form-control' %>
+    </div>
+  <% end %>
 
   <div class="form-group">
     <%= f.label :phone %><br>

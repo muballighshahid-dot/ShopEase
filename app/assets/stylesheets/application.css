@@ -349,6 +349,12 @@ body.site-body {
   text-decoration: none;
 }
 
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .profile-chip {
   display: inline-flex;
   align-items: center;
@@ -680,6 +686,14 @@ body.site-body {
   color: #111827;
 }
 
+.nav-logout {
+  margin: 0;
+}
+
+.guest-hero .hero-panel {
+  background: #0b1f3a;
+}
+
 .empty-state {
   color: var(--muted);
   border: 1px dashed var(--border);
@@ -847,6 +861,11 @@ body.site-body {
 
   .profile-chip-name {
     max-width: 90px;
+  }
+
+  .nav-auth {
+    width: 100%;
+    justify-content: center;
   }
 }
 

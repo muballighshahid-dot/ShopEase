@@ -25,6 +25,8 @@
   id="products-react-root"
   data-products="<%= json_escape(products_payload.to_json) %>"
   data-admin="<%= admin_user? %>"
+  data-customer="<%= customer_user? %>"
+  data-login-path="<%= login_users_path %>"
 ></div>
 
 <script>
@@ -35,6 +37,8 @@
     const e = React.createElement;
     const products = JSON.parse(rootElement.dataset.products || "[]");
     const isAdmin = rootElement.dataset.admin === "true";
+    const isCustomer = rootElement.dataset.customer === "true";
+    const loginPath = rootElement.dataset.loginPath;
 
     function actionLink(text, href, extraClasses, attrs) {
       const props = Object.assign(
@@ -63,7 +67,7 @@
             "data-turbo-confirm": "Are you sure?"
           })
         );
-      } else {
+      } else if (isCustomer) {
         actions.push(
           actionLink("Add to Cart", product.add_to_cart_path, "text-teal-700 hover:text-teal-900", {
             key: "cart",
@@ -76,6 +80,8 @@
             "data-turbo-method": "post"
           })
         );
+      } else {
+        actions.push(actionLink("Login to Purchase", loginPath, "text-sky-700 hover:text-sky-900", { key: "login" }));
       }
 
       return e("article", { className: "rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow-lg transition-shadow p-4 flex flex-col gap-3", key: product.id }, [

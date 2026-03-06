@@ -16,6 +16,7 @@ mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
     collection do
       get :login
       post :login, action: :login_create
+      delete :logout
     end
      resources :products
     resource :profile

@@ -9,9 +9,10 @@
 #   end
 # Clear old data
 Order.destroy_all
+User.destroy_all
 Product.destroy_all
 Category.destroy_all
-User.destroy_all
+
 
 # Users
 customer = User.create!(
